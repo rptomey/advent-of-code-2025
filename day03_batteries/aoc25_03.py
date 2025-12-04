@@ -12,26 +12,42 @@ def parse(file_name):
     with open(file_name) as f:
         for line in f:
             if line != "\n":
+                # Convert string of digits into a list of integers to allow numerical comparison
                 bank = [int(x) for x in list(line.strip())]
                 banks.append(bank)
     
     return banks
 
 def get_largest_joltage(bank, count):
+    # This function uses a greedy approach: Pick the largest available digit 
+    # for the current position, provided strictly enough digits remain to fill the rest.
     batteries = []
     min_index = 0
 
+    # Continue until we have selected the required number of batteries
     while len(batteries) < count:
+        # Calculate how many digits we need to reserve for future iterations
         positions_held = count - len(batteries) - 1
+
+        # Slice the bank to start from the index after the previously selected battery
         bank = bank[min_index:]
+
+        # Determine the search window. We cannot select a digit from the very end
+        # if we still need to fill 'positions_held' slots after this one.
         if positions_held > 0:
             sub_bank = bank[0:-positions_held]
         else:
+            # If this is the last digit we need, we can search the entire remainder
             sub_bank = bank[0:]
+
+        # Greedy choice: Find the maximum digit within the valid search window
         battery = max(sub_bank)
         batteries.append(battery)
+
+        # Update index to ensure the next selection appears *after* this one in the original list
         min_index = bank.index(battery)+1
 
+    # Join the selected digits to form the final joltage number
     return int("".join(str(n) for n in batteries))
 
 def part1(data):
@@ -39,6 +55,7 @@ def part1(data):
     total = 0
 
     for bank in data:
+        # Calculate max joltage using exactly 2 batteries per bank
         total += get_largest_joltage(bank, 2)
     
     return total
@@ -48,6 +65,7 @@ def part2(data):
     total = 0
 
     for bank in data:
+        # Calculate max joltage using exactly 12 batteries per bank
         total += get_largest_joltage(bank, 12)
     
     return total
