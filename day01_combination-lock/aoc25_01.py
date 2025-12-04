@@ -1,7 +1,5 @@
 import sys
 import time
-import re
-import copy
 
 # To run, go to the folder in the terminal, and enter:
 # python <code-filename.py> <input-filename.txt>
