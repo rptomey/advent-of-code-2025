@@ -1,8 +1,5 @@
 import sys
 import time
-import re
-import copy
-
 # To run, go to the folder in the terminal, and enter:
 # python <code-filename.py> <input-filename.txt>
 
@@ -11,7 +8,7 @@ import copy
 
 def parse(file_name):
     """Parse input"""
-    rolls = []
+    rolls = set()
 
     # First just get the stuff out of the file
     with open(file_name) as f:
@@ -19,7 +16,7 @@ def parse(file_name):
             if line.strip():    # Ignore empty lines
                 for x, char in enumerate(line.strip()): # x corresponds to column index
                     if char == "@":
-                        rolls.append((x,y))
+                        rolls.add((x,y))
     
     return rolls
 
@@ -38,6 +35,7 @@ def roll_accessible(data, roll):
     g = (x, y+1)
     h = (x+1, y+1)
 
+    # A roll is accessible if it's next to fewer than 4 other rolls
     neighboring_rolls = 0
 
     for neighbor in [a,b,c,d,e,f,g,h]:
@@ -51,6 +49,7 @@ def part1(data):
     """Solve part 1."""
     total = 0
     
+    # Just see how many rolls are accessible
     for roll in data:
         if roll_accessible(data, roll):
             total += 1
@@ -60,8 +59,10 @@ def part1(data):
 def part2(data):
     """Solve part 2."""
     total = 0
+    # Initialize to a safe value that will allow the while loop to happen
     accessible = -1
 
+    # In batches, remove the accessible rolls and count how many were in each batch
     while accessible != 0:
         accessible_rolls = []
         for roll in data:
