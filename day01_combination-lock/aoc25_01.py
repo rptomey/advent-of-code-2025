@@ -66,7 +66,7 @@ def part2(data):
         # Still need the new position
         position = rotate_dial(position, rotation)
 
-    return zeroes    
+    return zeroes
 
 def solve(puzzle_input):
     """Solve the puzzle for the given input."""
