@@ -1,2 +1,4 @@
 .DS_Store
 input.txt
+__pycache__/
+*.pyc
