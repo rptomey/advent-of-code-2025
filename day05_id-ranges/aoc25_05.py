@@ -1,5 +1,11 @@
 import sys
+import os
 import time
+
+# Add the parent directory to sys.path so we can find aoc_utils
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from aoc_utils.span_methods import merge_spans
 
 # To run, go to the folder in the terminal, and enter:
 # python <code-filename.py> <input-filename.txt>
@@ -24,7 +30,37 @@ def parse(file_name):
                 else:
                     data["spans"].add((int(numbers[0]), int(numbers[1])))
     
+    # Use merging to speed up both parts (hopefully)
+    data["spans"] = merge_spans(data["spans"])
+
     return data
+
+# def merge_spans(spans):
+#     # Sort the spans by their lowest number
+#     sorted_spans = sorted(spans, key=lambda x: x[0])
+
+#     # Set for holding new merged spans built from span overlap
+#     merged_spans = set()
+
+#     # Initialize span comparison with the first one in the list
+#     current_start, current_end = sorted_spans[0]
+
+#     # For all remaining spans, check for overlap
+#     for span in sorted_spans[1:]:
+#         next_start, next_end = span
+#         if next_start <= (current_end + 1):
+#             # Keep building the merged span
+#             current_end = max(current_end, next_end)
+#         else:
+#             # Save the merged span and start the next one
+#             merged_spans.add((current_start, current_end))
+#             current_start, current_end = next_start, next_end
+    
+#     # When we run out of spans to compare, we still have one waiting to be saved
+#     merged_spans.add((current_start, current_end))
+
+#     # Send back the simplified set of merged spans
+#     return merged_spans
 
 def part1(data):
     """Solve part 1."""
@@ -43,31 +79,32 @@ def part1(data):
 
 def part2(data):
     """Solve part 2."""
-    # Sort the spans by their lowest number
-    spans = sorted(data["spans"], key=lambda x: x[0])
+    # # Sort the spans by their lowest number
+    # spans = sorted(data["spans"], key=lambda x: x[0])
 
-    # Set for holding new merged spans built from span overlap
-    merged_spans = set()
+    # # Set for holding new merged spans built from span overlap
+    # merged_spans = set()
 
-    # Initialize span comparison with the first one in the list
-    current_start, current_end = spans[0]
+    # # Initialize span comparison with the first one in the list
+    # current_start, current_end = spans[0]
 
-    # For all remaining spans, check for overlap
-    for span in spans[1:]:
-        next_start, next_end = span
-        if next_start <= (current_end + 1):
-            # Keep building the merged span
-            current_end = max(current_end, next_end)
-        else:
-            # Save the merged span and start the next one
-            merged_spans.add((current_start, current_end))
-            current_start, current_end = next_start, next_end
+    # # For all remaining spans, check for overlap
+    # for span in spans[1:]:
+    #     next_start, next_end = span
+    #     if next_start <= (current_end + 1):
+    #         # Keep building the merged span
+    #         current_end = max(current_end, next_end)
+    #     else:
+    #         # Save the merged span and start the next one
+    #         merged_spans.add((current_start, current_end))
+    #         current_start, current_end = next_start, next_end
     
-    # When we run out of spans to compare, we still have one waiting to be saved
-    merged_spans.add((current_start, current_end))
+    # # When we run out of spans to compare, we still have one waiting to be saved
+    # merged_spans.add((current_start, current_end))
 
-    # Since the ranges are inclusive, remember the +1 after subtraction
-    return sum(span[1] - span[0] + 1 for span in merged_spans)
+    # # Since the ranges are inclusive, remember the +1 after subtraction
+    # return sum(span[1] - span[0] + 1 for span in merged_spans)
+    return sum(span[1] - span[0] + 1 for span in data["spans"])
 
 def solve(puzzle_input):
     """Solve the puzzle for the given input."""
