@@ -11,7 +11,7 @@ import copy
 
 def parse(file_name):
     """Parse input"""
-    reports = []
+    data = []
 
     # First just get the stuff out of the file
     with open(file_name) as f:
@@ -19,9 +19,9 @@ def parse(file_name):
             if line != "\n":
                 levels = re.split(r"\s+", line.strip())
                 report = [int(x) for x in levels]
-                reports.append(report)
+                data.append(report)
     
-    return reports
+    return data
 
 def part1(data):
     """Solve part 1."""
