@@ -34,6 +34,7 @@ def parse(file_name):
 
 def try_add_edge(graph, union_find, node_a, node_b, distance):
     # Only adds an edge if they're not already somehow connected through the graph
+    # Returning a T/F value facilitates keeping track of the last connections made for part 2
     if union_find[node_a] != union_find[node_b]:
         union_find.union(node_a, node_b)
         graph.add_edge(node_a, node_b, weight=distance)
