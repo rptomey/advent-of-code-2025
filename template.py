@@ -1,7 +1,15 @@
 import sys
+import os
 import time
 import re
 import copy
+
+# Add the parent directory to sys.path so we can find aoc_utils
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Import my helper functions, if needed
+from aoc_utils.span_methods import merge_spans
+from aoc_utils.distance_methods import point_to_point_distance as p_dist
 
 # To run, go to the folder in the terminal, and enter:
 # python <code-filename.py> <input-filename.txt>
