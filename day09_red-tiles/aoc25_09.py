@@ -1,20 +1,11 @@
 import sys
-import os
 import time
 import re
 import itertools
 from shapely.geometry import Polygon, box
 
-# Add the parent directory to sys.path so we can find aoc_utils
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from aoc_utils.distance_methods import point_to_point_distance as p_dist
-
 # To run, go to the folder in the terminal, and enter:
 # python <code-filename.py> <input-filename.txt>
-
-# Don't forget to use `copy.copy(thing)` or `copy.deepcopy(thing)`
-# to make changes to a thing without impacting the original version.
 
 def parse(file_name):
     """Parse input"""
