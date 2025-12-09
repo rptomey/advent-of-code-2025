@@ -1,0 +1,79 @@
+import sys
+import os
+import time
+import re
+import itertools
+from shapely.geometry import Polygon, box
+
+# Add the parent directory to sys.path so we can find aoc_utils
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from aoc_utils.distance_methods import point_to_point_distance as p_dist
+
+# To run, go to the folder in the terminal, and enter:
+# python <code-filename.py> <input-filename.txt>
+
+# Don't forget to use `copy.copy(thing)` or `copy.deepcopy(thing)`
+# to make changes to a thing without impacting the original version.
+
+def parse(file_name):
+    """Parse input"""
+    data = []
+
+    # First just get the stuff out of the file
+    with open(file_name) as f:
+        for line in f:
+            if line != "\n":
+                coords = re.findall(r"\d+", line)
+                point = tuple([int(x) for x in coords])
+                data.append(point)
+    
+    return data
+
+def rect_area(point_a, point_b):
+    width = abs(point_a[0] - point_b[0]) + 1
+    height = abs(point_a[1] - point_b[1]) + 1
+    return width * height
+
+def part1(data):
+    """Solve part 1."""
+    largest_area = 0
+
+    for tile_a, tile_b in itertools.combinations(data, 2):
+        area = rect_area(tile_a, tile_b)
+        if area > largest_area:
+            largest_area = area
+
+    return largest_area
+
+def part2(data):
+    """Solve part 2."""
+    polygon = Polygon(data)
+    largest_area = 0
+
+    for tile_a, tile_b in itertools.combinations(data, 2):
+        x1, x2 = sorted([tile_a[0], tile_b[0]])
+        y1, y2 = sorted([tile_a[1], tile_b[1]])
+        rectangle = box(minx=x1, miny=y1, maxx=x2, maxy=y2)
+        if polygon.covers(rectangle):
+            area = rect_area(tile_a, tile_b)
+            if area > largest_area:
+                largest_area = area
+    
+    return largest_area
+
+def solve(puzzle_input):
+    """Solve the puzzle for the given input."""
+    solution1 = part1(puzzle_input)
+    solution2 = part2(puzzle_input)
+
+    return solution1, solution2
+
+if __name__ == "__main__":
+    time_start = time.perf_counter()
+    for path in sys.argv[1:]:
+        print(f"{path}:")
+        puzzle_input = parse(path)
+        solutions = solve(puzzle_input)
+        print("\n".join(str(solution) for solution in solutions))
+        print(f"Solved in {time.perf_counter()-time_start:.5f} seconds")
