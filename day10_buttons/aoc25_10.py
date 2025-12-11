@@ -2,7 +2,7 @@ import sys
 import os
 import time
 import re
-import copy
+import z3
 from collections import deque
 
 # Add the parent directory to sys.path so we can find aoc_utils
@@ -84,9 +84,61 @@ def part1(data):
 
     return total
 
+def solve_with_z3(buttons, joltage_goal):
+    # Initialize the Optimizer
+    # Use Optimize() instead of Solver() because we want the fewest possible presses
+    optimizer = z3.Optimize()
+
+    # Define variables
+    # One integer per button
+    # Store in a list to access them by index
+    press_counts = [z3.Int(f"b_{i}") for i in range(len(buttons))]
+
+    # Add basic contraints (cannot press a button negative times)
+    for p in press_counts:
+        optimizer.add(p >= 0)
+
+    # Add system contraints (i.e., the equations)
+    num_counters = len(joltage_goal)
+
+    for counter_idx in range(num_counters):
+        # Find which buttons affect THIS specific counter
+        # If button 'i' has 'counter_idx' in its tuple, we include it in the sum.
+        vars_affecting_this_counter = []
+
+        for button_idx, affected_counters in enumerate(buttons):
+            if counter_idx in affected_counters:
+                vars_affecting_this_counter.append(press_counts[button_idx])
+        
+        # The sum of presses for these specific buttons must equal the goal for this counter
+        # z3.Sum() sums up the z3 variables
+        optimizer.add(z3.Sum(vars_affecting_this_counter) == joltage_goal[counter_idx])
+
+    # Set the object (minimize total number of button presses)
+    optimizer.minimize(z3.Sum(press_counts))
+
+    # Run the Solver with all of these settings
+    if optimizer.check() == z3.sat:
+        # Solution found
+        model = optimizer.model()
+
+        # Calculate the total presses from the model results
+        total_presses = sum(model[p].as_long() for p in press_counts)
+        return total_presses
+    else:
+        # Impossible result
+        return 0
+
 def part2(data):
     """Solve part 2."""
-    pass
+    total = 0
+
+    for machine in data:
+        buttons = machine[1]
+        joltage_goal = [int(n) for n in re.findall(r"\d+", machine[2])]
+        total += solve_with_z3(buttons, joltage_goal)
+
+    return total
 
 def solve(puzzle_input):
     """Solve the puzzle for the given input."""
