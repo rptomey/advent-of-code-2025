@@ -1,8 +1,14 @@
 import sys
+import os
 import time
 import re
 import networkx as nx
-import functools
+
+# Add the parent directory to sys.path so we can find aoc_utils
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Import my helper functions, if needed
+from aoc_utils.search_methods import dfs
 
 # To run, go to the folder in the terminal, and enter:
 # python <code-filename.py> <input-filename.txt>
@@ -34,30 +40,33 @@ def part1(data):
 
     return len(paths), G
 
-@functools.cache
-def count_paths(graph, current_node, found_fft, found_dac):
-    # Check if we've reached the target
-    if current_node == "out":
-        # Only count this path if we found both required nodes
-        return 1 if found_fft and found_dac else 0
-    
-    # Update state for current node and see if we're currently at a required node
-    new_fft = found_fft or (current_node == "fft")
-    new_dac = found_dac or (current_node == "dac")
-
-    # Sum up all valid paths from neighbors
-    total_valid = 0
-    for neighbor in graph.successors(current_node):
-        total_valid += count_paths(graph, neighbor, new_fft, new_dac)
-
-    return total_valid
-
 def part2(graph):
     """Solve part 2."""
     # Unfortunately, there are way too many paths to handle with networkx
     # so we have to use DFS (depth first search) with memoization.
 
-    return count_paths(graph, "svr", False, False)
+    # Define logic for finding neighbors (also keeping track of fft/dac touch in the path)
+    def get_neighbors(state):
+        node, has_fft, has_dac = state
+        next_states = []
+
+        if node in graph:
+            for neighbor in graph.successors(node):
+                new_fft = has_fft or (neighbor == "fft")
+                new_dac = has_dac or (neighbor == "dac")
+                next_states.append((neighbor, new_fft, new_dac))
+        
+        return next_states
+    
+    # Define logic that tells the search when the goal is hit
+    def is_goal(state):
+        node, has_fft, has_dac = state
+        return node == "out" and has_fft and has_dac
+    
+    # Define start state for DFS (start node, whether fft reached, whether dac reached)
+    initial_state = ("svr", False, False)
+
+    return dfs(start_state=initial_state, get_neighbors=get_neighbors, is_goal=is_goal, count_mode=True)
 
 def solve(puzzle_input):
     """Solve the puzzle for the given input."""
